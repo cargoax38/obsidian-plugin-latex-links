@@ -18,7 +18,7 @@ export default class LatexLinks extends Plugin {
 	async onload() {
 		this.observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
 		});
 	}
 
@@ -31,6 +31,11 @@ export default class LatexLinks extends Plugin {
 			const href = a.getAttribute('href');
 			if(href && !href.contains('internal-link') && !href.startsWith('http') && !href.startsWith('#')) {
 				a.classList.add('internal-link');
+				a.setAttribute('data-href', href.replace(".md", ""));
+
+				if(a instanceof HTMLAnchorElement) {
+					a.dataset.obsidianPatched = "true";
+				}
 			}
 		});
 	}
