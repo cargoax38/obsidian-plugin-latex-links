@@ -66,7 +66,7 @@ export default class LatexLinks extends Plugin {
 	 * 
 	 * @param a : the html element <a></a> related to the LaTeX link (either internal or external).
 	 */
-	async latexOpenNote(a: Element) {
+	async latexOpenNote(a: Element) : Promise<void> {
 		const source = a.getAttribute('href'); // get the \href content.
 
 		if(source && source.startsWith(this.settings.prefix + '/')) { // check if the link refers to an internal link (<prefix>/note).
