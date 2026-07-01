@@ -66,7 +66,7 @@ export default class LatexLinks extends Plugin {
 	 * 
 	 * @param a : the html element <a></a> related to the LaTeX link (either internal or external).
 	 */
-	async latexOpenNote(a: Element) : Promise<void> {
+	async latexOpenNote(a: Element) {
 		const source = a.getAttribute('href'); // get the \href content.
 
 		if(source && source.startsWith(this.settings.prefix + '/')) { // check if the link refers to an internal link (<prefix>/note).
@@ -89,7 +89,10 @@ export default class LatexLinks extends Plugin {
 	addInternalLinkClass() {
 		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
 			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
-			a.addEventListener('click', () => this.latexOpenNote(a));
+			a.addEventListener('click', () => {
+				this.latexOpenNote(a);
+				return;
+			});
 			a.addClass('latex-link');
 
 			if(a.instanceOf(HTMLAnchorElement)) {
