@@ -86,10 +86,14 @@ export default class LatexLinks extends Plugin {
 	/**
 	 * Function observed, check every time the links from LaTeX expressions that don't have the class 'latex-link'.
 	 */
-	async addInternalLinkClass() {
+	addInternalLinkClass() {
 		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
 			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
-			a.addEventListener('click', () => this.latexOpenNote(a));
+			a.addEventListener('click', () => {
+				(async () => {
+					this.latexOpenNote(a);
+				})();
+			});
 			a.addClass('latex-link');
 
 			if(a.instanceOf(HTMLAnchorElement)) {
