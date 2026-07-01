@@ -90,7 +90,7 @@ export default class LatexLinks extends Plugin {
 		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
 			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
 			a.addEventListener('click', () => {
-    			this.latexOpenNote(a).then();
+    			void this.latexOpenNote(a).then();
 			});
 			a.addClass('latex-link');
 
