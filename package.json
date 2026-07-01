@@ -1,10 +1,9 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"name": "Latex internal links",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "An obsidian plugin to add internal links into LaTeX expressions.",
 	"main": "main.js",
-	"type": "string",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
@@ -21,7 +20,7 @@
 		"eslint-plugin-obsidianmd": "^0.3.0",
 		"globals": "^17.6.0",
 		"jiti": "^2.6.1",
-		"obsidian": "latest",
+		"obsidian": "^1.1.0",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1"
 	}
