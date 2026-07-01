@@ -73,7 +73,7 @@ export default class LatexLinks extends Plugin {
 			const href = source.split(this.settings.prefix + '/')[1]; // remove <prefix>/ from the link.
 
 			if(href) {
-				const href2 = href + source.endsWith('.md') ? '' : '.md' // add to the end of the link the .md if not. It's important to have the .md to get the note file.
+				const href2 = href + (source.endsWith('.md') ? '' : '.md') // add to the end of the link the .md if not. It's important to have the .md to get the note file.
 				const file = this.app.vault.getAbstractFileByPath(href2); // get the note file.
 
 				if(file instanceof TFile) {
@@ -89,10 +89,8 @@ export default class LatexLinks extends Plugin {
 	addInternalLinkClass() {
 		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
 			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
-			a.addEventListener('click', () => {
-				(async () => {
-					this.latexOpenNote(a);
-				})();
+			a.addEventListener('click', async () => {
+    			await this.latexOpenNote(a);
 			});
 			a.addClass('latex-link');
 
