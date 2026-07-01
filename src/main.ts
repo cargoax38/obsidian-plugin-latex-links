@@ -19,7 +19,7 @@ export default class LatexLinks extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.observer.observe(document.body, {
+		this.observer.observe(activeDocument.body, {
 			childList: true,
 			subtree: true,
 		});
@@ -53,7 +53,7 @@ export default class LatexLinks extends Plugin {
 	}
 
 	addInternalLinkClass() {
-		document.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
+		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
 			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
 			a.addClass('latex-link');
 

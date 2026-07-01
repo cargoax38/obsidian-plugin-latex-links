@@ -22,7 +22,6 @@ export class LatexLinksSettingTab extends PluginSettingTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl('h2', {text : 'prefix'});
 
         new Setting(containerEl)
             .setName('Prefix')
