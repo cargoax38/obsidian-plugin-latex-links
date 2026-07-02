@@ -1,9 +1,7 @@
 import {
 	App,
-	debounce,
 	Plugin,
 	PluginManifest,
-	TFile,
 } from 'obsidian'
 import { DEFAULT_PREFIX, LatexLinksSettings, LatexLinksSettingTab } from './settings';
 
@@ -33,7 +31,7 @@ export default class LatexLinks extends Plugin {
 	onunload() {
 		this.observer.disconnect();
 
-		document.querySelectorAll('mjx-math a.internal-link').forEach(a => {
+		activeDocument.querySelectorAll('mjx-math a.internal-link').forEach(a => {
 			a.removeClass('internal-link');
 			a.removeAttribute('data-href');
 			a.removeAttribute('aria-label');
@@ -47,7 +45,7 @@ export default class LatexLinks extends Plugin {
 	 * 
 	 * @param event 
 	 */
-	waitOver(event: Event) {
+	waitOver = (event: Event) => {
 		event.stopImmediatePropagation();
 	}
 
@@ -64,7 +62,7 @@ export default class LatexLinks extends Plugin {
 					if(href != '') {
 						a.addClass('internal-link');
 						a.addEventListener('mouseenter', () => a.addEventListener('mouseover', this.waitOver));
-						a.addEventListener('mouseleave', () => a.removeEventListener('mouseover', this.waitOver))
+						a.addEventListener('mouseleave', () => a.removeEventListener('mouseover', this.waitOver));
 
 						a.addClass('internal-link');
 						a.setAttribute('data-href', href);
