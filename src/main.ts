@@ -1,5 +1,6 @@
 import {
 	App,
+	debounce,
 	Plugin,
 	PluginManifest,
 	TFile,
@@ -25,77 +26,54 @@ export default class LatexLinks extends Plugin {
 			subtree: true,
 		});
 
-		// Using the obsidian function from the core plugin "Page Viewer".
-		this.registerHoverLinkSource('latex-links-plugin', {
-			display: "Latex Links",
-			defaultMod: false
-		});
-
 		// Creating the plugin's menu.
 		this.addSettingTab(new LatexLinksSettingTab(this.app, this));
 	}
 
 	onunload() {
 		this.observer.disconnect();
+
+		document.querySelectorAll('mjx-math a.internal-link').forEach(a => {
+			a.removeClass('internal-link');
+			a.removeAttribute('data-href');
+			a.removeAttribute('aria-label');
+			a.removeAttribute('data-tooltip-position');
+		});
 	}
 
 	/**
-	 * Function that generates only the popup.
+	 * Function that block a specific event, in that case it's 'mouseenter' and 'mouseleave' from link within a latex expression.
+	 * This might create conflict with other plugins, but considering the specific application for internal links in LaTeX expression, I decided to use the 'stopImmediatePropagation' function.
 	 * 
-	 * @param a : the html element <a></a> related to the LaTeX link (either internal or external).
-	 * @param event : the event triggered, here from 'mouseenter'.
+	 * @param event 
 	 */
-	latexTriggerHover(a: Element, event: Event) {
-		const source = a.getAttribute('href'); // get the \href content.
-
-		if(source && source.startsWith(this.settings.prefix + '/')) { // check if the link refers to an internal link (<prefix>/note).
-			const href = source.split(this.settings.prefix + '/')[1]; // remove <prefix>/ from the link.
-
-			this.app.workspace.trigger('hover-link', {
-				event,
-				source: 'latex-links-plugin',
-				hoverParent: a,
-				targetEl: a,
-				linktext: href
-			});
-		}
-	}
-
-	/**
-	 * Function that opens the note page when the internal link is clicked.
-	 * 
-	 * @param a : the html element <a></a> related to the LaTeX link (either internal or external).
-	 */
-	async latexOpenNote(a: Element) {
-		const source = a.getAttribute('href'); // get the \href content.
-
-		if(source && source.startsWith(this.settings.prefix + '/')) { // check if the link refers to an internal link (<prefix>/note).
-			const href = source.split(this.settings.prefix + '/')[1]; // remove <prefix>/ from the link.
-
-			if(href) {
-				const href2 = href + (source.endsWith('.md') ? '' : '.md') // add to the end of the link the .md if not. It's important to have the .md to get the note file.
-				const file = this.app.vault.getAbstractFileByPath(href2); // get the note file.
-
-				if(file instanceof TFile) {
-					await this.app.workspace.getMostRecentLeaf()?.openFile(file); // open the note.
-				}
-			}
-		}
+	waitOver(event: Event) {
+		event.stopImmediatePropagation();
 	}
 
 	/**
 	 * Function observed, check every time the links from LaTeX expressions that don't have the class 'latex-link'.
 	 */
 	addInternalLinkClass() {
-		activeDocument.querySelectorAll('mjx-math a:not(.latex-link)').forEach(a => {
-			a.addEventListener('mouseenter', (event) => this.latexTriggerHover(a, event));
-			a.addEventListener('click', () => {
-    			void this.latexOpenNote(a).then();
-			});
-			a.addClass('latex-link');
-
+		activeDocument.querySelectorAll('mjx-math a:not(.internal-link)').forEach(a => {
 			if(a.instanceOf(HTMLAnchorElement)) {
-				a.dataset.obsidianPatched = "true";
+				const source = a.getAttribute('href') || ''; // get the \href content.
+				if(source.startsWith(this.settings.prefix + '/')) {
+					const href = source.split(this.settings.prefix + '/')[1] || '';
+
+					if(href != '') {
+						a.addClass('internal-link');
+						a.addEventListener('mouseenter', () => a.addEventListener('mouseover', this.waitOver));
+						a.addEventListener('mouseleave', () => a.removeEventListener('mouseover', this.waitOver))
+
+						a.addClass('internal-link');
+						a.setAttribute('data-href', href);
+						a.setAttribute('aria-label', href);
+						a.setAttribute('data-tooltip-position', 'top');
+
+						a.dataset.obsidianPatched = "true";
+					}
+				}
 			}
 		});
 	}
